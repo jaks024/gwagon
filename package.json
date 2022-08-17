@@ -1,0 +1,36 @@
+{
+  "name": "gwagon",
+  "version": "1.0.0",
+  "description": "A containerized backend to simplify payload delivery between client and Google Drive",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint" : "npx eslint src",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node .",
+    "docker": "npm run build && docker build -t gwagon . && docker run -dp 3000:3000 gwagon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaks024/gwagon.git"
+  },
+  "author": "jaks024",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaks024/gwagon/issues"
+  },
+  "homepage": "https://github.com/jaks024/gwagon#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.7.6",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "typescript": "^4.7.4"
+  },
+  "keywords": []
+}
