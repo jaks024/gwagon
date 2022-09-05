@@ -1,13 +1,16 @@
+import { UserRefreshClient } from "google-auth-library";
 import { google } from "googleapis";
 
-export function DriveController()
-{
+export function DriveController() {
     const CLIENT_ID = "1019728199135-2bqo08s8e7ml30shimo019a4pqu275e1.apps.googleusercontent.com";
+    const CLIENT_SECRET = "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";
 
     const authClient = new google.auth.OAuth2(
-        CLIENT_ID
+        CLIENT_ID,  
+        CLIENT_SECRET,  
+        "http://localhost:3001" // set this to site address
     );
-    
+
     const drive = google.drive( {
         version: "v3",
         auth: authClient
@@ -16,6 +19,27 @@ export function DriveController()
     const updateAuthClient = (accessToken: string) => {
         authClient.setCredentials({ access_token: accessToken});
     };
+
+    const getRefreshToken = async (code: string) => {
+        const { tokens } = await authClient.getToken(code).catch(err => {
+            console.log(err);
+            return err;
+        });
+        return {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token
+        }    
+    };
+
+    const getAccessToken = async (refreshToken: string) => {
+        const user = new UserRefreshClient(
+            CLIENT_ID,
+            CLIENT_SECRET,
+            refreshToken,
+        );
+        const { credentials } = await user.refreshAccessToken(); 
+        return credentials.access_token;
+    }
 
     const createFile = async (accessToken: string, fileName: string) => {
         updateAuthClient(accessToken);
@@ -48,7 +72,7 @@ export function DriveController()
         updateAuthClient(accessToken);
         try {
             const response = await drive.files.list({
-                q: `name="${"test"}" and trashed=false and mimeType="text/plain"`,
+                q: `trashed=${false} and mimeType="text/plain"`,
               });  
               console.log(response.data);
         } catch (error) {
@@ -57,9 +81,11 @@ export function DriveController()
     };
 
     return {
+        GetRefreshToken: getRefreshToken,
+        GetAccessToken: getAccessToken,
         CreateFile: createFile,
         SaveFile: saveFile,
         GetFile: getFile,
-        listFiles: listFiles
+        ListFiles: listFiles
     };
 }
