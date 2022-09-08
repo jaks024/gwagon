@@ -29,20 +29,46 @@ app.get("/auth/access", async (req, res) => {
 });
 
 // get computed summary data for <year> <month> 
-app.get("/summary/:year-:month", (req, res) => {
-  
+app.get("/summary/:year-:month", async (req, res) => {
+  const entires = await driveController.GetFile(req.header(accessTokenHeaderName), driveController.GetSaveFileName(req.params.month, req.params.year));
   res.send(`${req.params.month} - ${req.params.year}`);
   res.json();
 }); 
 
-// get all entires for <year> <month> 
-app.get("/history/:year-:month", (req, res) => {
+// create a empty new file with file name 
+app.post("/create/:fileName", async (req, res) => {
+  const status = await driveController.CreateFile(req.header(accessTokenHeaderName), req.params.fileName);
+  res.json(status);
+});
 
+// list all files with matching name 
+app.get("/list/:fileName", async (req, res) => {
+  const files = await driveController.ListFiles(req.header(accessTokenHeaderName), req.params.fileName);
+  res.json(files);
+});
+
+// get save file data (all entries for year-month)
+app.get("/get/:year-:month", async(req, res) => {
+  const content = await driveController.GetFile(req.header(accessTokenHeaderName), driveController.GetSaveFileName(req.params.month, req.params.year));
+  res.json(content);
+});
+
+// delete all files with matching file name
+app.delete("/delete/:fileName", async (req, res) => {
+  const status = await driveController.DeleteFile(req.header(accessTokenHeaderName), req.params.fileName);
+  res.sendStatus(status);
 });
 
 // add new entry
 app.post("/add", async (req, res) => {
-  await driveController.SaveFile(req.header(accessTokenHeaderName), req.body);
+  const status = await driveController.AddEntry(req.header(accessTokenHeaderName), req.body);
+  res.sendStatus(status);
+});
+
+// overwrite file data with body content 
+app.post("/save", async (req, res) => {
+  const status = await driveController.SaveData(req.header(accessTokenHeaderName), req.header("fileId"), req.body);
+  res.sendStatus(status);
 });
 
 

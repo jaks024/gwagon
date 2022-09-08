@@ -1,7 +1,6 @@
 import { DateSortMode } from "./models/DateSortMode";
 import { EntrySortMode } from "./models/EntrySortMode";
 import { IEntry } from "./models/IEntry";
-import { IMonth } from "./models/IMonth";
 import { ISummary } from "./models/ISummary";
 
 export function DataService() {
@@ -41,21 +40,8 @@ export function DataService() {
         }
     };
 
-    const sortMonthsBy = (monthsData: IMonth[], sortMode: DateSortMode) => {
-        switch(sortMode) {
-            case DateSortMode.None:
-                return monthsData;
-            case DateSortMode.Ascending:
-                return monthsData.sort((a, b) => a.month - b.month);
-            case DateSortMode.Descending: {
-                return monthsData.sort((a, b) => b.month - a.month);
-            }
-        }
-    };
-
     return {
         SortEntries: sortEntiresBy,
-        SortMonths: sortMonthsBy, 
         Summarize: summarize
     };
 }
