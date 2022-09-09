@@ -4,4 +4,6 @@ export interface ISummary {
     incomeAverage: number;
     expenseAverage: number;
     numOfEntires: number;
+    incomeTagSums: Map<string, number>;
+    expenseTagSums: Map<string, number>;
 }

@@ -5,7 +5,8 @@ import { IEntry } from "./models/IEntry";
 export function DriveController() {
     const CLIENT_ID = "1019728199135-2bqo08s8e7ml30shimo019a4pqu275e1.apps.googleusercontent.com";
     const CLIENT_SECRET = "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";
-
+    const USERDATA_FILENAME = "gwagon-userdata";
+    
     const authClient = new google.auth.OAuth2(
         CLIENT_ID,  
         CLIENT_SECRET,  
@@ -57,17 +58,17 @@ export function DriveController() {
             }
         }).catch( (err) => {
             console.log(err);
-            return err;
+            return 500;
         });
-        console.log(response.status);
-        return response.status;
+        console.log((response as any).status);
+        return (response as any).status;
     };
 
     const getSaveFileName = (month: number | string, year: number | string) => {
         return `${year}-${month}`;
     }
 
-    const getFileIdFromDate = async (accessToken: string, fileName: string) => {
+    const getFileIdFromFileName = async (accessToken: string, fileName: string) => {
         const files = await listFiles(accessToken, fileName);
         if (files.length == 0) {
             return -1;
@@ -88,14 +89,14 @@ export function DriveController() {
         }
         
         const saveFileName = getSaveFileName(entry.month, entry.year);
-        let fileId = await getFileIdFromDate(accessToken, saveFileName);
+        let fileId = await getFileIdFromFileName(accessToken, saveFileName);
         
         let isNewFile = false;
         if (fileId === -1) {
             console.log(`file id not found from ${saveFileName}, attempting to create save file`)
             const createStatus = await createFile(accessToken, saveFileName);
             if (createStatus === 200) {
-                fileId = await getFileIdFromDate(accessToken, saveFileName);
+                fileId = await getFileIdFromFileName(accessToken, saveFileName);
                 if (fileId === -1) {
                     console.log("failed to create new save file");
                     return 500;
@@ -150,7 +151,7 @@ export function DriveController() {
     const getFile = async (accessToken: string, fileName: string) => {
         updateAuthClient(accessToken);
 
-        const fileId = await getFileIdFromDate(accessToken, fileName);
+        const fileId = await getFileIdFromFileName(accessToken, fileName);
         if (fileId == -1) {
             console.log(`did not fild file with name ${fileName}`)
             return 500;
@@ -210,20 +211,47 @@ export function DriveController() {
             media: {
                 body: data
             }
-        })
+        });
         console.log(response);
         return response.status;
+    }
+
+    const createUserData = async (accessToken: string) => {
+        const status = await createFile(accessToken, USERDATA_FILENAME);
+        return status;
+    }
+
+    const getUserData = async (accessToken: string) => {
+        const fileId = await getFileIdFromFileName(accessToken, USERDATA_FILENAME);
+        console.log(fileId);
+        if (fileId == -1) {
+            return null;
+        }
+        const data = await getFileFromId(fileId);
+        return data;
+    };
+    
+    const saveUserData = async (accessToken: string, data: string) => {
+        const fileId = await getFileIdFromFileName(accessToken, USERDATA_FILENAME);
+        if (fileId == -1) {
+            return 500;
+        }
+        const status = saveData(accessToken, fileId, data);
+        return status;
     }
 
     return {
         GetRefreshToken: getRefreshToken,
         GetAccessToken: getAccessToken,
         CreateFile: createFile,
+        CreateUserData: createUserData,
         AddEntry: addEntry,
         SaveData: saveData,
+        SaveUserData: saveUserData,
         DeleteFile: deleteFile,
         GetSaveFileName: getSaveFileName,
         GetFile: getFile,
+        GetUserData: getUserData,
         ListFiles: listFiles
     };
 }
