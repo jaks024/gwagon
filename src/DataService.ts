@@ -1,4 +1,3 @@
-import { DateSortMode } from "./models/DateSortMode";
 import { EntrySortMode } from "./models/EntrySortMode";
 import { IEntry } from "./models/IEntry";
 import { ISummary } from "./models/ISummary";
@@ -27,7 +26,7 @@ export function DataService() {
                 return;
             }
             map.set(key, map.get(key) + val);
-        }
+        };
 
         let expenseTotal = 0;
         let incomeTotal = 0;
@@ -36,7 +35,7 @@ export function DataService() {
             const curTagSum = entry.isExpense ? expenseTagSums : incomeTagSums;
             tags.forEach(tag => {
                 addToTagSums(curTagSum, tag, entry.amount);
-            })  
+            });
             if (entry.isExpense) {
                 expenseTotal += entry.amount;   
             } else {

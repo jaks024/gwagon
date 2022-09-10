@@ -32,9 +32,9 @@ export function DriveController() {
             return {
                 accessToken: response.tokens.access_token,
                 refreshToken: response.tokens.refresh_token
-            }    
+            };
         } 
-        return status;
+        return 500;
     };
 
     const getAccessToken = async (refreshToken: string) => {
@@ -45,7 +45,7 @@ export function DriveController() {
         );
         const { credentials } = await user.refreshAccessToken(); 
         return credentials.access_token;
-    }
+    };
 
     const createFile = async (accessToken: string, fileName: string) => {
         updateAuthClient(accessToken);
@@ -69,7 +69,7 @@ export function DriveController() {
 
     const getSaveFileName = (month: number | string, year: number | string) => {
         return `${year}-${month}`;
-    }
+    };
 
     const getFileIdFromFileName = async (accessToken: string, fileName: string) => {
         const files = await listFiles(accessToken, fileName);
@@ -77,7 +77,7 @@ export function DriveController() {
             return -1;
         }
         return files[0].id;
-    }
+    };
 
     const addEntry = async (accessToken: string, data: string) => {
         updateAuthClient(accessToken);
@@ -96,7 +96,7 @@ export function DriveController() {
         
         let isNewFile = false;
         if (fileId === -1) {
-            console.log(`file id not found from ${saveFileName}, attempting to create save file`)
+            console.log(`file id not found from ${saveFileName}, attempting to create save file`);
             const createStatus = await createFile(accessToken, saveFileName);
             if (createStatus === 200) {
                 fileId = await getFileIdFromFileName(accessToken, saveFileName);
@@ -168,7 +168,7 @@ export function DriveController() {
         });
         
         return response.status;
-    }
+    };
 
     const getFileFromId = async (fileId: string) => {
         const response = await drive.files.get({
@@ -189,7 +189,7 @@ export function DriveController() {
 
         const fileId = await getFileIdFromFileName(accessToken, fileName);
         if (fileId == -1) {
-            console.log(`did not fild file with name ${fileName}`)
+            console.log(`did not fild file with name ${fileName}`);
             return 500;
         }
         return getFileFromId(fileId);
@@ -250,12 +250,12 @@ export function DriveController() {
         });
         console.log(response);
         return response.status;
-    }
+    };
 
     const createUserData = async (accessToken: string) => {
         const status = await createFile(accessToken, USERDATA_FILENAME);
         return status;
-    }
+    };
 
     const getUserData = async (accessToken: string) => {
         const fileId = await getFileIdFromFileName(accessToken, USERDATA_FILENAME);
@@ -274,7 +274,7 @@ export function DriveController() {
         }
         const status = saveData(accessToken, fileId, data);
         return status;
-    }
+    };
 
     return {
         GetRefreshToken: getRefreshToken,

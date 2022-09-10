@@ -1,10 +1,13 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
+
 import express from "express";
 import { DataService } from "./DataService";
 import { DriveController } from "./DriveController";
 import { IEntry } from "./models/IEntry";
 import { ISummary } from "./models/ISummary";
+require("dotenv").config();
 
-const cors = require('cors');
+const cors = require("cors");
 const app = express();
 const driveController = DriveController();
 const dataService = DataService();
@@ -44,7 +47,7 @@ app.get("/summary/:year-:month", async (req, res) => {
       numOfEntires: 0,
       incomeTagSums: new Map(),
       expenseTagSums: new Map()
-    }
+    };
     res.json(blankSummary);
     return;
   }
