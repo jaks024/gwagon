@@ -50,18 +50,21 @@ export function DriveController() {
     const createFile = async (accessToken: string, fileName: string) => {
         updateAuthClient(accessToken);
         
-        const response = await drive.files.create({
+        let status = 500;
+        await drive.files.create({
             requestBody: {
                 name: fileName,
                 parents: ["appDataFolder"],
                 mimeType: "application/json",
             }
-        }).catch( (err) => {
+        })
+        .then(res => {
+            status = res.status;
+        })
+        .catch( (err) => {
             console.log(err);
-            return 500;
         });
-        console.log((response as any).status);
-        return (response as any).status;
+        return status;
     };
 
     const getSaveFileName = (month: number | string, year: number | string) => {
@@ -133,6 +136,39 @@ export function DriveController() {
         
         return response.status;
     };
+
+    const removeEntry = async (accessToken: string, year: string, month: string, entryId: string) => {
+        const fileId = await getFileIdFromFileName(accessToken, getSaveFileName(month, year));
+        const retrievdData = await getFileFromId(fileId);
+        if (retrievdData === 500) {
+            console.log(`failed to retireve data from file id: ${fileId}`);
+            return 500;
+        }
+        const savedData: IEntry[] = JSON.parse(JSON.stringify(retrievdData));
+        let entryIndex = -1;
+        console.log("entry id " + entryId);
+        for (let i = 0; i < savedData.length; ++i) {
+            console.log(savedData[i].id.toString());
+            if (savedData[i].id.toString() == entryId) {
+                entryIndex = i;
+            }
+        }
+        if (entryIndex === -1) {
+            return 200;
+        }
+        console.log("removed index " + entryIndex);
+        savedData.splice(entryIndex, 1);
+        const updatedData = JSON.stringify(savedData);
+        
+        const response = await drive.files.update({
+            fileId: fileId,
+            media: {
+                body: updatedData
+            }
+        });
+        
+        return response.status;
+    }
 
     const getFileFromId = async (fileId: string) => {
         const response = await drive.files.get({
@@ -252,6 +288,7 @@ export function DriveController() {
         GetSaveFileName: getSaveFileName,
         GetFile: getFile,
         GetUserData: getUserData,
-        ListFiles: listFiles
+        ListFiles: listFiles,
+        RemoveEntry: removeEntry
     };
 }

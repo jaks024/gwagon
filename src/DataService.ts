@@ -5,6 +5,8 @@ import { ISummary } from "./models/ISummary";
 
 export function DataService() {
 
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
     const summarize = (entries: IEntry[]): ISummary => {
 
         const summary: ISummary = {
@@ -31,7 +33,6 @@ export function DataService() {
         let incomeTotal = 0;
         entries.forEach(entry => {
             const tags = entry.tags.split(" ");
-            console.log(tags);
             const curTagSum = entry.isExpense ? expenseTagSums : incomeTagSums;
             tags.forEach(tag => {
                 addToTagSums(curTagSum, tag, entry.amount);
@@ -48,8 +49,10 @@ export function DataService() {
         summary.incomeTotal = incomeTotal;
         summary.incomeTagSums = Object.fromEntries(incomeTagSums);
 
-        summary.incomeAverage = summary.incomeTotal / entries.length;
-        summary.expenseAverage = summary.expenseTotal / entries.length;
+        const days = entries.length > 0 ? daysInMonth[entries[0].month] : 31;
+
+        summary.incomeAverage = summary.incomeTotal / days;
+        summary.expenseAverage = summary.expenseTotal / days;
         
         return summary;
     };

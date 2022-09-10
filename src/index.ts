@@ -104,6 +104,10 @@ app.patch("/userdata", async (req, res) => {
   res.sendStatus(status);
 });
 
+app.delete("/delete/:year-:month/:id", async (req, res) => {
+  const status = await driveController.RemoveEntry(req.header(accessTokenHeaderName), req.params.year, req.params.month, req.params.id);
+  res.sendStatus(status);
+});
 
 app.listen(port, () => {
   console.log(`server is running at http://localhost:${port}`);
