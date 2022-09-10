@@ -4,13 +4,13 @@ import { IEntry } from "./models/IEntry";
 
 export function DriveController() {
     const CLIENT_ID = "1019728199135-2bqo08s8e7ml30shimo019a4pqu275e1.apps.googleusercontent.com";
-    const CLIENT_SECRET = "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";
+    const CLIENT_SECRET = process.env.CLIENTSECRET;
     const USERDATA_FILENAME = "gwagon-userdata";
     
     const authClient = new google.auth.OAuth2(
         CLIENT_ID,  
         CLIENT_SECRET,  
-        "http://localhost:3001" // set this to site address
+        process.env.APPDOMAIN
     );
 
     const drive = google.drive( {

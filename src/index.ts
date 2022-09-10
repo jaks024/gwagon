@@ -9,7 +9,7 @@ const app = express();
 const driveController = DriveController();
 const dataService = DataService();
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const accessTokenHeaderName = "accessToken";
 const refreshTokenHeaderName = "refreshToken";
 
@@ -110,5 +110,5 @@ app.delete("/delete/:year-:month/:id", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`server is running at http://localhost:${port}`);
+  console.log(`server is running at ${port}`);
 });
