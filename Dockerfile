@@ -3,6 +3,7 @@ FROM node:12-alpine
 RUN apk add --no-cache python2 g++ make
 WORKDIR /
 COPY . .
-RUN yarn install --production
+RUN npm install --production
+RUN npm run build
 CMD ["node", "dist/index.js"]
 EXPOSE 3000
